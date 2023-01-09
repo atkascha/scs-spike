@@ -1,0 +1,144 @@
+<html>
+  <head>
+    <title>Twitch Credits</title>
+    <style>
+
+      html,
+      body {
+        background: url(./download.png) no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+      }
+
+      label {
+        color: white;
+      }
+
+      .scroll {
+        font-family: sans-serif;
+        position: fixed;
+          top: 10;
+          left: 10;
+        width: calc(100% - 20px);
+      }
+
+      .section {
+        color: white;
+        margin-bottom: 20px;
+      }
+
+      .title {
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="scroll"></div>
+
+    <div id="config">
+      <input type="range" min="0" max="100" id="followers" />
+      <label for="followers">Followers</label>
+      <br />
+      <input type="range" min="0" max="100" id="donations" />
+      <label for="donations">Donations</label>
+      <br />
+      <input type="range" min="0" max="100" id="bits" />
+      <label for="bits">Bits</label>
+      <br />
+      <input type="range" min="0" max="100" id="gifters" />
+      <label for="gifters">Gifters</label>
+      <br />
+      <input type="range" min="0" max="100" id="subscribers" />
+      <label for="subscribers">Subscribers</label>
+      <br />
+      <br />
+      <button>Scroll Credits</button>
+    </div>
+  </body>
+  <script src="./names.js"></script>
+  <script src="./data.js"></script>
+  <script>
+
+    class Scroller {
+      constructor(data) {
+        this.config = document.querySelector('#config');
+        this.data = data;
+        this.isScrolling = false;
+
+        this.scrollDiv = document.querySelector('.scroll');
+        this.button = document.querySelector('button');
+
+        this.button.addEventListener('click', function(_e) {
+          this.scroll();
+        }.bind(this));
+      }
+
+      scroll() {
+        buildData();
+        this.time = 60;
+        this.config.style.display = 'none';
+        this.isScrolling = true;
+
+        for (let title in this.data) {
+          if (!this.data[title].length) {
+            continue;
+          }
+          this.scrollDiv.appendChild(this.#sectionHTML(title, this.data[title]));
+        }
+
+        // move below page
+        this.scrollDiv.style.top = window.innerHeight;
+
+        let distance = this.scrollDiv.getBoundingClientRect().bottom;
+        let scrollDivHeight = this.scrollDiv.clientHeight;
+
+        // FIXME... time doesn't work 100% right
+
+        this.scrollInterval = setInterval(function() {
+          let px = parseInt(this.scrollDiv.style.top.split('px')[0]);
+          this.scrollDiv.style.top = px - 1;
+        }.bind(this), (this.time / distance));
+      }
+
+      #sectionHTML(title, names) {
+        let sectionDiv = document.createElement('div');
+        sectionDiv.className = 'section';
+
+        sectionDiv.appendChild(this.#titleHTML(title));
+        sectionDiv.appendChild(this.#namesHTML(names));
+
+        return sectionDiv;
+      }
+
+      #titleHTML(titleName) {
+        let titleDiv = document.createElement('div');
+        titleDiv.className = 'title';
+        titleDiv.innerText = titleName;
+
+        return titleDiv;
+      }
+
+      #namesHTML(names) {
+        let namesDiv = document.createElement('div');
+        namesDiv.className = 'names';
+
+        for (let i = 0; i < names.length; i++) {
+          let name = names[i];
+          let nameDiv = document.createElement('div');
+          nameDiv.innerText = name;
+
+          namesDiv.appendChild(nameDiv);
+        }
+
+        return namesDiv;
+      }
+    }
+
+    const scroller = new Scroller(DATA);
+
+  </script>
+</html>
